@@ -16,7 +16,7 @@ To up-date version and create a release-
 * Merge to release  
 * From release select 'new tag' using version as tag name (format = v0.1-alpha-2 etc.)  
 * Push with 'Push tags' checked  
-* On GitHub, click 'create a new release' - use pre-release if applicable  
+* On GitHub, click 'create a new release' - use pre-release if applicable, choose correct tag, add description and comments  
 * Merge release to master  
 * Merge release to develop  
 * Checkout feature branch  
