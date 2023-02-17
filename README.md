@@ -12,9 +12,9 @@ To up-date version and create a release-
 * Update in pom.xml (version) and Dockerfile (copy and entry points) 
 * Rebuild and retest  
 * Commit and push  
-* Merge to develop  
+* Merge to develop and push  
 * Merge to release  
-* From release select 'new tag' using version as tag name  
+* From release select 'new tag' using version as tag name (format = v0.1-alpha-2 etc.)  
 * Push with 'Push tags' checked  
 * On GitHub, click 'create a new release' - use pre-release if applicable  
 * Merge release to master  
