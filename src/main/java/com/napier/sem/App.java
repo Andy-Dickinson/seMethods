@@ -4,8 +4,8 @@ import java.sql.*;
 
 public class App
 {
-    /* Ensure set to false before pushing to GitHub
-   If setting to false and testing locally, start db first before running app
+    /* Ensure set to false before pushing to GitHub or for running via docker-compose.
+       If setting to true and testing locally, start db first before running app. Will ONLY be able to run via App main()
     */
     private Boolean test_on_localhost = false;
 
@@ -17,14 +17,14 @@ public class App
         // Connect to database
         a.connect();
 
-//        // Get Employee by ID
-//        Employee emp = a.getEmployee(255530);
-//        // Display results
-//        a.displayEmployee(emp);
+        // Get Employee by ID
+        Employee emp = a.getEmployee(255530);
+        // Display results
+        a.displayEmployee(emp);
 
 
         // Test method to print all employees first names
-        a.getEmployees();
+//        a.getEmployees();
 
         // Disconnect from database
         a.disconnect();
@@ -66,11 +66,16 @@ public class App
             Statement stmt = con.createStatement();
             // Create string for SQL statement
             String strSelect =
-                    "SELECT employees.emp_no, employees.first_name, employees.last_name" //", salaries.salary "
-                            + "FROM employees "
-                            //+ "INNER JOIN salaries"
-                            //+ "ON employees.emp_no = salaries.emp_no"
-                            + "WHERE employees.emp_no = " + ID;
+                    "select employees.emp_no, employees.first_name, employees.last_name, t.title, s.salary, d.dept_name, dm.emp_no as dm\n"
+                    + "from employees\n"
+                    + "join salaries s on employees.emp_no = s.emp_no\n"
+                    + "join titles t on employees.emp_no = t.emp_no\n"
+                    + "join dept_emp de on employees.emp_no = de.emp_no\n"
+                    + "join departments d on de.dept_no = d.dept_no\n"
+                    + "join dept_manager dm on d.dept_no = dm.dept_no\n"
+                    + "WHERE t.to_date = '9999-01-01'\n"
+                    + "and s.to_date = '9999-01-01'\n"
+                    + "and dm.to_date = '9999-01-01' and employees.emp_no = " + ID;
             // Execute SQL statement
             ResultSet rset = stmt.executeQuery(strSelect);
             // Return new employee if valid.
@@ -81,7 +86,10 @@ public class App
                 emp.emp_no = rset.getInt("employees.emp_no");
                 emp.first_name = rset.getString("employees.first_name");
                 emp.last_name = rset.getString("employees.last_name");
-                emp.salary = rset.getInt("salaries.salary");
+                emp.title = rset.getString("t.title");
+                emp.salary = rset.getInt("s.salary");
+                emp.dept_name = rset.getString("d.dept_name");
+                emp.manager = rset.getString("dm");
                 return emp;
             }
             else
@@ -107,9 +115,9 @@ public class App
                     emp.emp_no + " "
                             + emp.first_name + " "
                             + emp.last_name + "\n"
-                            + emp.title + "\n"
-                            + "Salary:" + emp.salary + "\n"
-                            + emp.dept_name + "\n"
+                            + "Title: " + emp.title + "\n"
+                            + "Salary: " + emp.salary + "\n"
+                            + "Department: " + emp.dept_name + "\n"
                             + "Manager: " + emp.manager + "\n");
         }
     }
@@ -142,17 +150,17 @@ public class App
             try
             {
                 int delay = 30000;
-                String port = "3306";
+                String port = "db:3306";
                 if (test_on_localhost) {
                     delay = 0;
-                    port = "33060";
+                    port = "localhost:33060";
                 }
                 // Wait a bit for db to start
                 Thread.sleep(delay); // Change delay to 30000 before pushing to GitHub, set to 0 when db up and running and testing locally
                 // Connect to database
                 //docker use db:3306
                 //local use localhost:30060
-                con = DriverManager.getConnection("jdbc:mysql://db:" + port + "/world?useSSL=false", "root", "example");
+                con = DriverManager.getConnection("jdbc:mysql://" + port + "/employees?useSSL=false", "root", "example");
                 System.out.println("Successfully connected");
                 break;
             }
